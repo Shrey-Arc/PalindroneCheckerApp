@@ -1,42 +1,64 @@
+/** @author Shrey-Arc */
+public interface PalindromeCheckerApp {
+    boolean isPalindrome(String text);
+}
 
-public class PalindromeChecker {
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Stack;
 
-    private String content;
-
-    public PalindromeChecker(String content) {
-        this.content = normalize(content);
-    }
-
-    private String normalize(String input) {
-        if (input == null) return "";
-        return input.toLowerCase().replaceAll("[^a-z0-9]", "");
-    }
-
-    public boolean check() {
-        if (content.isEmpty()) return true;
-        
-        int left = 0;
-        int right = content.length() - 1;
-
-        while (left < right) {
-            if (content.charAt(left) != content.charAt(right)) {
-                return false;
-            }
-            left++;
-            right--;
+// Strategy A: Using a Deque
+class DequeStrategy implements PalindromeStrategy {
+    @Override
+    public boolean isPalindrome(String text) {
+        Deque<Character> deque = new ArrayDeque<>();
+        for (char c : text.toCharArray()) deque.addLast(c);
+        while (deque.size() > 1) {
+            if (deque.removeFirst() != deque.removeLast()) return false;
         }
         return true;
     }
 }
 
+// Strategy B: Using a Stack
+class StackStrategy implements PalindromeStrategy {
+    @Override
+    public boolean isPalindrome(String text) {
+        Stack<Character> stack = new Stack<>();
+        for (char c : text.toCharArray()) stack.push(c);
+        for (char c : text.toCharArray()) {
+            if (c != stack.pop()) return false;
+        }
+        return true;
+    }
+}
+
+public class PalindromeContext {
+    private PalindromeStrategy strategy;
+
+    // Inject strategy at runtime
+    public void setStrategy(PalindromeStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public boolean executeCheck(String input) {
+        // Pre-processing (Normalization) happens here once
+        String clean = input.toLowerCase().replaceAll("[^a-z0-9]", "");
+        return strategy.isPalindrome(clean);
+    }
+}
+
 public class Main {
     public static void main(String[] args) {
-        PalindromeChecker pc = new PalindromeChecker("No 'x' in Nixon");
+        PalindromeContext solver = new PalindromeContext();
+        String testWord = "Racecar";
 
-        if (pc.check()) {
-            System.out.println("It's a palindrome!");
-        } else {
-            System.out.println("Not a palindrome.");
-        }
+        // Switch to Deque logic
+        solver.setStrategy(new DequeStrategy());
+        System.out.println("Using Deque: " + solver.executeCheck(testWord));
+
+        // Switch to Stack logic dynamically
+        solver.setStrategy(new StackStrategy());
+        System.out.println("Using Stack: " + solver.executeCheck(testWord));
     }
 }
