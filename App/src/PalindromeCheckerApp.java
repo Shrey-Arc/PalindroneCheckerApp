@@ -1,5 +1,5 @@
 /** @author Shrey-Arc */
-public class PalindromePerformance {
+public class PalindromeCheckerApp {
 
     public static void comparePerformance(String testString) {
         String clean = testString.toLowerCase().replaceAll("[^a-z0-9]", "");
